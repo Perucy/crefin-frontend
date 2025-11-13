@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'colors.dart';
 import 'settings.dart';
 import 'income.dart';
+import 'dashboard.dart';
 
 void main() {
   runApp(const CrefinApp());
@@ -89,6 +90,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _getScreenForIndex(int index) {
     switch (index) {
+      case 0:
+        return const DashboardScreen();
       case 1:
         return const IncomeScreen();
       case 4:
