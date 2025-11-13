@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'colors.dart';
+import 'settings.dart';
+import 'income.dart';
 
 void main() {
   runApp(const CrefinApp());
 }
 
-class CrefinApp extends StatelessWidget {
+class CrefinApp extends StatefulWidget {
   const CrefinApp({super.key});
+
+  @override
+  State<CrefinApp> createState() => _CrefinAppState();
+}
+
+class _CrefinAppState extends State<CrefinApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +40,21 @@ class CrefinApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.darkBackground,
-        cardColor: AppColors.lightCard
+        cardColor: AppColors.darkCard,
       ),
 
-      themeMode: ThemeMode.system,
+      themeMode: _themeMode,
 
-      home: const MainScreen(),
+      home: MainScreen(onToggleTheme: _toggleTheme),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final VoidCallback onToggleTheme;
+  
+  const MainScreen({super.key, required this.onToggleTheme});
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -50,79 +69,88 @@ class _MainScreenState extends State<MainScreen> {
     'AI',
     'Settings'
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: SafeArea(
-          child: Center(
-            child: Text(
-              _screens[_currentIndex],
-              style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
+      body: Stack(
+        children: [
+          _getScreenForIndex(_currentIndex),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _buildDynamicIslandNavBar(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getScreenForIndex(int index) {
+    switch (index) {
+      case 1:
+        return const IncomeScreen();
+      case 4:
+        return SettingsScreen(onToggleTheme: widget.onToggleTheme);  // Pass callback
+      default:
+        return Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(
+            child: Center(
+              child: Text(
+                _screens[index],
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
                       ? AppColors.darkText
                       : AppColors.lightText,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: _buildDynamicIslandNavBar(),
-    );
+        );
+    }
   }
 
   Widget _buildDynamicIslandNavBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 25,
-            spreadRadius: 0,
-            offset: const Offset(0, 10)
+      margin: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(50),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E).withOpacity(0.8),
+              borderRadius: BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 25,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildNavItem(icon: Icons.home, label: 'Dashboard', index: 0),
+                _buildNavItem(icon: Icons.description_outlined, label: 'Income', index: 1),
+                _buildNavItem(icon: Icons.track_changes_sharp, label: 'Finances', index: 2),
+                _buildNavItem(icon: Icons.hub, label: 'AI', index: 3),
+                _buildNavItem(icon: Icons.settings, label: 'Settings', index: 4),
+              ],
+            ),
           ),
-        ],
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(
-            icon: Icons.home,
-            label: 'Dashboard',
-            index: 0,
-          ),
-          _buildNavItem(
-            icon: Icons.description_outlined,
-            label: 'Income',
-            index: 1,
-          ),
-          _buildNavItem(
-            icon: Icons.track_changes_sharp,
-            label: 'Finances',
-            index: 2,
-          ),
-          _buildNavItem(
-            icon: Icons.hub,
-            label: 'AI',
-            index: 3,
-          ),
-          _buildNavItem(
-            icon: Icons.settings,
-            label: 'Settings',
-            index: 4,
-          ),
-        ],
+        ),
       ),
     );
   }
+
   Widget _buildNavItem({
     required IconData icon,
     required String label,
@@ -140,28 +168,20 @@ class _MainScreenState extends State<MainScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         padding: const EdgeInsets.all(10),
-
         decoration: BoxDecoration(
           color: isSelected
                 ? Colors.white.withOpacity(0.15)
                 : Colors.transparent,
           borderRadius: BorderRadius.circular(50),
         ),
-
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                    ? Colors.white                    // Full white if selected
-                    : Colors.white.withOpacity(0.5),
-              size: 24,
-            ),
-          ],
+        child: Icon(
+          icon,
+          color: isSelected
+                ? Colors.white
+                : Colors.white.withOpacity(0.5),
+          size: 24,
         ),
       ),
     );
   }
 }
-
