@@ -82,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
                               color: isDark ? AppColors.darkText : AppColors.lightText,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 6),
 
                           // stats grid (2x2)
                           GridView.count(
