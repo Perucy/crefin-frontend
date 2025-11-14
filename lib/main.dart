@@ -4,6 +4,7 @@ import 'colors.dart';
 import 'settings.dart';
 import 'income.dart';
 import 'dashboard.dart';
+import 'invoices_client.dart';
 
 void main() {
   runApp(const CrefinApp());
@@ -93,7 +94,7 @@ class _MainScreenState extends State<MainScreen> {
       case 0:
         return const DashboardScreen();
       case 1:
-        return const IncomeScreen();
+        return const InvoicesClientsScreen();
       case 4:
         return SettingsScreen(onToggleTheme: widget.onToggleTheme);  // Pass callback
       default:
