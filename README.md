@@ -6,8 +6,11 @@ A beautiful, modern Flutter mobile application for freelance finance management 
 
 *Watch the app in action - featuring dashboard analytics, invoice management, and seamless dark/light mode switching.*
 
----![github-crefin-demo](https://github.com/user-attachments/assets/1b9ff8c0-1921-4af1-84c3-16b5f0c87ea6)
+*Light Mode*
+![Adobe Express - Final Crefin demo light mode](https://github.com/user-attachments/assets/41428c64-a3a9-4e12-9ebc-f2bc99130c8a)  
 
+*Dark Mode*
+![Adobe Express - Final Crefin demo  dark mode (4)](https://github.com/user-attachments/assets/79d5d5c7-cb54-4681-ab28-a4c5e1e6a75d)
 
 ## 🎯 Overview
 
