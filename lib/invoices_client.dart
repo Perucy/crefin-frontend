@@ -66,7 +66,7 @@ class _InvoicesClientsScreenState extends State<InvoicesClientsScreen> {
                               color: isDark ? AppColors.darkText : AppColors.lightText,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 6),
 
                           // tab switcher
                           Container(
@@ -279,16 +279,21 @@ class _InvoicesClientsScreenState extends State<InvoicesClientsScreen> {
                               );
                             }).toList(),
                           ] else ...[
-                            // Clients content will go here
-                            Text(
-                              'Clients list coming next!',
-                              style: TextStyle(
-                                color: isDark ? AppColors.darkText : AppColors.lightText,
-                              ),
-                            ),
+                            // Clients list
+                            ...clients.where((client) {
+                              // filter by search
+                              final name = client['name'] as String;
+                              final matchesSearch = _searchQuery.isEmpty || 
+                                  name.toLowerCase().contains(_searchQuery.toLowerCase());
+                              return matchesSearch;
+                            }).map((client) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildClientCard(client, isDark),
+                              );
+                            }).toList(),
                           ],
                           const SizedBox(height: 16),
-
                         ],
                       ),
                     ),
@@ -338,6 +343,221 @@ class _InvoicesClientsScreenState extends State<InvoicesClientsScreen> {
     return '\$${formatter.format(amount)}';
   }
 
+  Map<String, dynamic> _getRiskColor(int riskScore) {
+    if (riskScore < 30) {
+      return {
+        'bg': const Color(0xFFE8F8EE),  // Light green
+        'color': AppColors.green,
+        'label': 'Low',
+      };
+    } else if (riskScore < 60) {
+      return {
+        'bg': const Color(0xFFFFF3E0),  // Light orange
+        'color': AppColors.orange,
+        'label': 'Medium',
+      };
+    } else {
+      return {
+        'bg': const Color(0xFFFFE5E5),  // Light red
+        'color': AppColors.red,
+        'label': 'High',
+      };
+    }
+  }
+
+  Widget _buildClientCard(Map<String, dynamic> client, bool isDark) {
+    final name = client['name'] as String;
+    final riskScore = client['riskScore'] as int;
+    final totalRevenue = client['totalRevenue'] as int;
+    final avgPaymentTime = client['avgPaymentTime'] as int;
+    final trend = client['trend'] as String;
+    final invoiceCount = client['invoiceCount'] as int;
+
+    // risk color info
+    final riskInfo = _getRiskColor(riskScore);
+    // Get trend icon and color
+    IconData trendIcon;
+    Color trendColor;
+    
+    if (trend == 'up') {
+      trendIcon = Icons.trending_up;
+      trendColor = AppColors.green;
+    } else if (trend == 'down') {
+      trendIcon = Icons.trending_down;
+      trendColor = AppColors.red;
+    } else {
+      trendIcon = Icons.remove;
+      trendColor = isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText;
+    }
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+            BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: client name, risk card, trend icon, chevron
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Client name
+                    Row(
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? AppColors.darkText : AppColors.lightText,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                
+                    // risk badge + trend icon
+                    Row(
+                      children: [
+                        // risk badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: riskInfo['bg'],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${riskInfo['label']} Risk',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: riskInfo['color'],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // trend icon
+                        Icon(
+                          trendIcon,
+                          size: 14,
+                          color: trendColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // divider
+          Container(
+            height: 1,
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
+          const SizedBox(height: 12),
+          
+
+          // Bottom row: total revenue, avg payment, invoices
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+            children: [
+              // total revenue
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Total Revenue',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${(totalRevenue / 1000).toStringAsFixed(1)}k',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkText : AppColors.lightText
+                    ),
+                  ),
+                ],
+              ),
+
+              // avg payment
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Avg Payment',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${avgPaymentTime}d',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkText : AppColors.lightText,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Invoices
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Invoices',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$invoiceCount',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkText : AppColors.lightText,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          
+          
+        ],
+      ),
+    );
+  }
   Widget _buildInvoiceCard(Map<String, dynamic> invoice, bool isDark) {
     final id = invoice['id'] as String;
     final client = invoice['client'] as String;
@@ -431,6 +651,7 @@ class _InvoicesClientsScreenState extends State<InvoicesClientsScreen> {
             ],
           ),
           const SizedBox(height: 12),
+          
           // Bottom row: Amount and Due Date
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
