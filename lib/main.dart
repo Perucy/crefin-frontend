@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'colors.dart';
 import 'settings.dart';
-import 'income.dart';
+import 'ai_insights.dart';
 import 'dashboard.dart';
 import 'invoices_client.dart';
+import 'finances_goals.dart';
 
 void main() {
   runApp(const CrefinApp());
@@ -95,6 +96,10 @@ class _MainScreenState extends State<MainScreen> {
         return const DashboardScreen();
       case 1:
         return const InvoicesClientsScreen();
+      case 2:
+        return const FinancesGoalsScreen();
+      case 3:
+        return const AIInsightsScreen();
       case 4:
         return SettingsScreen(onToggleTheme: widget.onToggleTheme);  // Pass callback
       default:
