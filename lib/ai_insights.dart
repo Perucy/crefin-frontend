@@ -164,7 +164,7 @@ class AIInsightsScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 6),
 
                     // Quick Stats
                     ...quickStats.map((stat) {
