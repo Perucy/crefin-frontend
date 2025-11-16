@@ -40,7 +40,7 @@ class SettingsScreen extends StatelessWidget {
                               color: isDark ? AppColors.darkText : AppColors.lightText,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 6),
 
                           // Profile Information
                           _buildSettingsCard(
