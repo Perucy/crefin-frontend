@@ -47,3 +47,4 @@ coverage/
 /macos/
 /windows/
 /linux/
+*.mov
