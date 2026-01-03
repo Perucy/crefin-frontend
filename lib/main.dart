@@ -6,6 +6,11 @@ import 'ai_insights.dart';
 import 'dashboard.dart';
 import 'invoices_client.dart';
 import 'finances_goals.dart';
+import 'screens/auth/forgot_passwd.dart';
+import 'screens/auth/login.dart';
+import 'screens/auth/register.dart';
+import 'screens/splash_screen.dart';
+import 'screens/onboarding/onboard_cont.dart';
 
 void main() {
   runApp(const CrefinApp());
@@ -48,7 +53,18 @@ class _CrefinAppState extends State<CrefinApp> {
 
       themeMode: _themeMode,
 
-      home: MainScreen(onToggleTheme: _toggleTheme),
+      // home: MainScreen(onToggleTheme: _toggleTheme),
+      initialRoute: '/',
+
+      // routes
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/onboarding': (context) => const OnboardingContainer(), // ← Add this
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/main': (context) => MainScreen(onToggleTheme: _toggleTheme),
+      },
     );
   }
 }
