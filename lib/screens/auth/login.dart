@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/logo.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../colors.dart';
+import '../../services/auth_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,9 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         _error = 'Please enter your email and password';
@@ -41,16 +39,53 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      // TODO: Replace with actual API call to your backend
+      // Example:
+      // final response = await http.post(
+      //   Uri.parse('http://localhost:3000/api/v1/auth/login'),
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: jsonEncode({
+      //     'email': _emailController.text,
+      //     'password': _passwordController.text,
+      //   }),
+      // );
+      //
+      // if (response.statusCode == 200) {
+      //   final data = jsonDecode(response.body);
+      //   await AuthStorage.saveAuthData(
+      //     token: data['token'],
+      //     refreshToken: data['refreshToken'],
+      //     userId: data['user']['id'],
+      //   );
+      // } else {
+      //   throw Exception('Login failed');
+      // }
 
-    // TODO: Navigate to MainScreen after successful login
-    // For now, just show success
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login functionality coming soon!')),
+      // Simulating API call for now
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Save auth tokens (replace with real tokens from your API)
+      await AuthStorage.saveAuthData(
+        token: 'dummy_jwt_token',
+        refreshToken: 'dummy_refresh_token',
+        userId: 'user_123',
       );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+
+      // Navigate to MainScreen (Dashboard)
+      Navigator.pushReplacementNamed(context, '/main');
+
+    } catch (e) {
+      setState(() {
+        _error = 'Login failed. Please check your credentials.';
+        _isLoading = false;
+      });
     }
   }
 
