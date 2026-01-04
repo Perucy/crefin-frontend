@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'colors.dart';
+import 'screens/create_invoice.dart';
+import 'screens/add_expense.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -800,7 +802,23 @@ class DashboardScreen extends StatelessWidget {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // TODO: Navigate to create invoice
+                                    Navigator.push(
+                                      context, 
+                                      MaterialPageRoute(
+                                        builder: (context) => CreateInvoiceScreen(
+                                          onBack: () => Navigator.pop(context),
+                                          onSave: (invoiceData, isDraft) {
+                                            if (isDraft) {
+                                              print('Invoice saved as draft: $invoiceData');
+                                            } else {
+                                              print('Invoice created: $invoiceData');
+                                            }
+                                            // TODO: call API
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(16),
@@ -852,7 +870,19 @@ class DashboardScreen extends StatelessWidget {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // TODO: Navigate to log expense
+                                    Navigator.push(
+                                      context, 
+                                      MaterialPageRoute(
+                                        builder: (context) => AddExpenseScreen(
+                                          onBack: () => Navigator.pop(context), 
+                                          onSave: (expenseData) {
+                                            print('Expense saved: $expenseData');
+                                            // TODO: call API
+                                            Navigator.pop(context);
+                                          }
+                                        )
+                                      )
+                                    );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(16),
