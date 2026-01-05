@@ -120,29 +120,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Everything Scrollable (Header + Form)
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 0,
-                bottom: 120, // Space for floating buttons
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header (now inside scroll view)
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: borderColor, width: 1),
-                      ),
-                    ),
-                    child: Row(
+      body: Stack(
+        children: [
+          // Everything Scrollable (Header + Form)
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
@@ -150,10 +141,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           child: Container(
                             width: 40,
                             height: 40,
-                            decoration: BoxDecoration(
-                              color: cardBg,
-                              shape: BoxShape.circle,
-                            ),
+                            // decoration: BoxDecoration(
+                            //   color: cardBg,
+                            //   shape: BoxShape.circle,
+                            // ),
                             child: Icon(
                               Icons.arrow_back,
                               color: textColor,
@@ -172,205 +163,120 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         const SizedBox(width: 40),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 6),
 
-                  // Client Selector
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Client ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: red),
+                    // Client Selector
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Client ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showClientDropdown = !_showClientDropdown;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: _errors.containsKey('client') ? red : borderColor,
-                              width: _errors.containsKey('client') ? 2 : 1,
-                            ),
-                          ),
-                          child: Row(
                             children: [
-                              Icon(Icons.search, color: tertiaryText, size: 20),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  _selectedClient,
-                                  style: TextStyle(
-                                    color: _selectedClient == _clients[0]
-                                        ? tertiaryText
-                                        : textColor,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                _showClientDropdown
-                                    ? Icons.keyboard_arrow_up
-                                    : Icons.keyboard_arrow_down,
-                                color: tertiaryText,
-                                size: 20,
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: red),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      if (_errors.containsKey('client'))
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            _errors['client']!,
-                            style: TextStyle(color: red, fontSize: 12),
+                        const SizedBox(height: 6),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showClientDropdown = !_showClientDropdown;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: _errors.containsKey('client') ? red : borderColor,
+                                width: _errors.containsKey('client') ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: tertiaryText, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _selectedClient,
+                                    style: TextStyle(
+                                      color: _selectedClient == _clients[0]
+                                          ? tertiaryText
+                                          : textColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  _showClientDropdown
+                                      ? Icons.keyboard_arrow_up
+                                      : Icons.keyboard_arrow_down,
+                                  color: tertiaryText,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      if (_showClientDropdown)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: borderColor),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
+                        if (_errors.containsKey('client'))
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _errors['client']!,
+                              style: TextStyle(color: red, fontSize: 12),
+                            ),
                           ),
-                          child: Column(
-                            children: [
-                              // Search Input
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: bgColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.search, color: tertiaryText, size: 16),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _clientSearchController,
-                                          autofocus: true,
-                                          style: TextStyle(color: textColor, fontSize: 14),
-                                          decoration: InputDecoration(
-                                            hintText: 'Search clients...',
-                                            hintStyle: TextStyle(color: tertiaryText),
-                                            border: InputBorder.none,
-                                            isDense: true,
-                                            contentPadding: EdgeInsets.zero,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                        if (_showClientDropdown)
+                          Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: borderColor),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
                                 ),
-                              ),
-                              // Client List
-                              Container(
-                                constraints: const BoxConstraints(maxHeight: 224),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _clients.length,
-                                  itemBuilder: (context, index) {
-                                    final client = _clients[index];
-                                    final isSelected = _selectedClient == client;
-                                    if (_clientSearchController.text.isNotEmpty &&
-                                        !client.toLowerCase().contains(
-                                            _clientSearchController.text.toLowerCase())) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedClient = client;
-                                          _showClientDropdown = false;
-                                          _clientSearchController.clear();
-                                          _errors.remove('client');
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 14,
-                                        ),
-                                        color: isSelected ? blueBg : Colors.transparent,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              client,
-                                              style: TextStyle(
-                                                color: textColor,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            if (isSelected)
-                                              Icon(Icons.check, color: blue, size: 20),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              if (_clientSearchController.text.isNotEmpty)
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedClient = _clientSearchController.text;
-                                      _showClientDropdown = false;
-                                      _clientSearchController.clear();
-                                      _errors.remove('client');
-                                    });
-                                  },
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                // Search Input
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
                                   child: Container(
-                                    padding: const EdgeInsets.all(16),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: greenBg,
-                                      border: Border(
-                                        top: BorderSide(color: borderColor),
-                                      ),
+                                      color: bgColor,
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.add, color: green, size: 20),
-                                        const SizedBox(width: 12),
+                                        Icon(Icons.search, color: tertiaryText, size: 16),
+                                        const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(
-                                            'Add "${_clientSearchController.text}" as new client',
-                                            style: TextStyle(
-                                              color: green,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
+                                          child: TextField(
+                                            controller: _clientSearchController,
+                                            autofocus: true,
+                                            style: TextStyle(color: textColor, fontSize: 14),
+                                            decoration: InputDecoration(
+                                              hintText: 'Search clients...',
+                                              hintStyle: TextStyle(color: tertiaryText),
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.zero,
                                             ),
                                           ),
                                         ),
@@ -378,453 +284,537 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                     ),
                                   ),
                                 ),
+                                // Client List
+                                Container(
+                                  constraints: const BoxConstraints(maxHeight: 224),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: _clients.length,
+                                    itemBuilder: (context, index) {
+                                      final client = _clients[index];
+                                      final isSelected = _selectedClient == client;
+                                      if (_clientSearchController.text.isNotEmpty &&
+                                          !client.toLowerCase().contains(
+                                              _clientSearchController.text.toLowerCase())) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedClient = client;
+                                            _showClientDropdown = false;
+                                            _clientSearchController.clear();
+                                            _errors.remove('client');
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 14,
+                                          ),
+                                          color: isSelected ? blueBg : Colors.transparent,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                client,
+                                                style: TextStyle(
+                                                  color: textColor,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              if (isSelected)
+                                                Icon(Icons.check, color: blue, size: 20),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                if (_clientSearchController.text.isNotEmpty)
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedClient = _clientSearchController.text;
+                                        _showClientDropdown = false;
+                                        _clientSearchController.clear();
+                                        _errors.remove('client');
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: greenBg,
+                                        border: Border(
+                                          top: BorderSide(color: borderColor),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.add, color: green, size: 20),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              'Add "${_clientSearchController.text}" as new client',
+                                              style: TextStyle(
+                                                color: green,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Due Date Picker
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Due Date ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: red),
+                              ),
                             ],
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Due Date Picker
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Due Date ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: red),
+                        const SizedBox(height: 6),
+                        GestureDetector(
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now().add(const Duration(days: 30)),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                _selectedDueDate = date;
+                                _errors.remove('dueDate');
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: _errors.containsKey('dueDate') ? red : borderColor,
+                                width: _errors.containsKey('dueDate') ? 2 : 1,
+                              ),
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                Icon(Icons.calendar_today_outlined, color: tertiaryText, size: 20),
+                                const SizedBox(width: 12),
+                                Text(
+                                  _selectedDueDate != null
+                                      ? '${_selectedDueDate!.year}-${_selectedDueDate!.month.toString().padLeft(2, '0')}-${_selectedDueDate!.day.toString().padLeft(2, '0')}'
+                                      : 'Select due date',
+                                  style: TextStyle(
+                                    color: _selectedDueDate != null ? textColor : tertiaryText,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now().add(const Duration(days: 30)),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
-                          );
-                          if (date != null) {
-                            setState(() {
-                              _selectedDueDate = date;
-                              _errors.remove('dueDate');
-                            });
-                          }
-                        },
-                        child: Container(
+                        if (_errors.containsKey('dueDate'))
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _errors['dueDate']!,
+                              style: TextStyle(color: red, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Description
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Description ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: red),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: _errors.containsKey('dueDate') ? red : borderColor,
-                              width: _errors.containsKey('dueDate') ? 2 : 1,
+                              color: _errors.containsKey('description') ? red : borderColor,
+                              width: _errors.containsKey('description') ? 2 : 1,
                             ),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.calendar_today_outlined, color: tertiaryText, size: 20),
+                              Icon(Icons.description_outlined, color: tertiaryText, size: 20),
                               const SizedBox(width: 12),
-                              Text(
-                                _selectedDueDate != null
-                                    ? '${_selectedDueDate!.year}-${_selectedDueDate!.month.toString().padLeft(2, '0')}-${_selectedDueDate!.day.toString().padLeft(2, '0')}'
-                                    : 'Select due date',
-                                style: TextStyle(
-                                  color: _selectedDueDate != null ? textColor : tertiaryText,
-                                  fontSize: 16,
+                              Expanded(
+                                child: TextField(
+                                  controller: _descriptionController,
+                                  style: TextStyle(color: textColor, fontSize: 16),
+                                  decoration: InputDecoration(
+                                    hintText: 'e.g., Website Design & Development',
+                                    hintStyle: TextStyle(color: tertiaryText),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  onChanged: (_) {
+                                    if (_errors.containsKey('description')) {
+                                      setState(() {
+                                        _errors.remove('description');
+                                      });
+                                    }
+                                  },
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      if (_errors.containsKey('dueDate'))
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            _errors['dueDate']!,
-                            style: TextStyle(color: red, fontSize: 12),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Description
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Description ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: red),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: _errors.containsKey('description') ? red : borderColor,
-                            width: _errors.containsKey('description') ? 2 : 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.description_outlined, color: tertiaryText, size: 20),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _descriptionController,
-                                style: TextStyle(color: textColor, fontSize: 16),
-                                decoration: InputDecoration(
-                                  hintText: 'e.g., Website Design & Development',
-                                  hintStyle: TextStyle(color: tertiaryText),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                onChanged: (_) {
-                                  if (_errors.containsKey('description')) {
-                                    setState(() {
-                                      _errors.remove('description');
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_errors.containsKey('description'))
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            _errors['description']!,
-                            style: TextStyle(color: red, fontSize: 12),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Total Amount - Featured
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Total Amount ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: TextStyle(color: red),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: _errors.containsKey('amount') ? red : borderColor,
-                            width: _errors.containsKey('amount') ? 2 : 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: greenBg,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(
-                                Icons.attach_money,
-                                color: green,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _amountController,
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '0.00',
-                                  hintStyle: TextStyle(color: tertiaryText),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                onChanged: (_) {
-                                  if (_errors.containsKey('amount')) {
-                                    setState(() {
-                                      _errors.remove('amount');
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_errors.containsKey('amount'))
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            _errors['amount']!,
-                            style: TextStyle(color: red, fontSize: 12),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Notes (Optional)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Notes ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '(Optional)',
-                              style: TextStyle(
-                                color: tertiaryText,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Icon(Icons.notes_outlined, color: tertiaryText, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _notesController,
-                                maxLines: 3,
-                                style: TextStyle(color: textColor, fontSize: 16),
-                                decoration: InputDecoration(
-                                  hintText: 'Add any additional notes or details...',
-                                  hintStyle: TextStyle(color: tertiaryText),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Payment Terms (Optional)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: 'Payment Terms ',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '(Optional)',
-                              style: TextStyle(
-                                color: tertiaryText,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Icon(Icons.description_outlined, color: tertiaryText, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _paymentTermsController,
-                                maxLines: 2,
-                                style: TextStyle(color: textColor, fontSize: 16),
-                                decoration: InputDecoration(
-                                  hintText: 'Enter payment terms and conditions...',
-                                  hintStyle: TextStyle(color: tertiaryText),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Floating Buttons at Bottom
-            // Floating Buttons at Bottom
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: 24,
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: borderColor, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _handleSaveDraft,
-                            borderRadius: BorderRadius.circular(20),
-                            child: Center(
-                              child: Text(
-                                'Save as Draft',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: textColor,
-                                ),
-                              ),
+                        if (_errors.containsKey('description'))
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _errors['description']!,
+                              style: TextStyle(color: red, fontSize: 12),
                             ),
                           ),
-                        ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF34C759), Color(0xFF2FB350)],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: green.withOpacity(0.4),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
+                    const SizedBox(height: 16),
+
+                    // Total Amount - Featured
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Total Amount ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                          ],
+                            children: [
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: red),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _handleCreateInvoice,
-                            borderRadius: BorderRadius.circular(20),
-                            child: const Center(
-                              child: Text(
-                                'Create Invoice',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: _errors.containsKey('amount') ? red : borderColor,
+                              width: _errors.containsKey('amount') ? 2 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: greenBg,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(
+                                  Icons.attach_money,
+                                  color: green,
+                                  size: 24,
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _amountController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: '0.00',
+                                    hintStyle: TextStyle(color: tertiaryText),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  onChanged: (_) {
+                                    if (_errors.containsKey('amount')) {
+                                      setState(() {
+                                        _errors.remove('amount');
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                        if (_errors.containsKey('amount'))
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _errors['amount']!,
+                              style: TextStyle(color: red, fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Notes (Optional)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Notes ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '(Optional)',
+                                style: TextStyle(
+                                  color: tertiaryText,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Icon(Icons.notes_outlined, color: tertiaryText, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _notesController,
+                                  maxLines: 3,
+                                  style: TextStyle(color: textColor, fontSize: 16),
+                                  decoration: InputDecoration(
+                                    hintText: 'Add any additional notes or details...',
+                                    hintStyle: TextStyle(color: tertiaryText),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Payment Terms (Optional)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: 'Payment Terms ',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '(Optional)',
+                                style: TextStyle(
+                                  color: tertiaryText,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: borderColor),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Icon(Icons.description_outlined, color: tertiaryText, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextField(
+                                  controller: _paymentTermsController,
+                                  maxLines: 2,
+                                  style: TextStyle(color: textColor, fontSize: 16),
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter payment terms and conditions...',
+                                    hintStyle: TextStyle(color: tertiaryText),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Floating Buttons at Bottom
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 24,
+            child: SafeArea(
+              top: false,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderColor, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleSaveDraft,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Center(
+                            child: Text(
+                              'Save as Draft',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF34C759), Color(0xFF2FB350)],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: green.withOpacity(0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleCreateInvoice,
+                          borderRadius: BorderRadius.circular(16),
+                          child: const Center(
+                            child: Text(
+                              'Create Invoice',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
