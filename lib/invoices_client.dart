@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'colors.dart';
+import 'screens/create_invoice.dart';
 
 class InvoicesClientsScreen extends StatefulWidget {
   const InvoicesClientsScreen({super.key});
@@ -215,7 +216,23 @@ class _InvoicesClientsScreenState extends State<InvoicesClientsScreen> {
                             // Create Invoice Button
                             GestureDetector(
                               onTap: () {
-                                // TODO: Navigate to create invoice
+                                Navigator.push(
+                                  context, 
+                                  MaterialPageRoute(
+                                    builder: (context) => CreateInvoiceScreen(
+                                      onBack: () => Navigator.pop(context),
+                                      onSave: (invoiceData, isDraft) {
+                                        if (isDraft) {
+                                          print('Invoice saved as draft: $invoiceData');
+                                        } else {
+                                          print('Invoice created: $invoiceData');
+                                        }
+                                        // TODO: call API
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                );
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(16),
