@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'colors.dart';
+import 'screens/add_expense.dart';
+import 'screens/add_income.dart';
 
 class FinancesGoalsScreen extends StatefulWidget {
   const FinancesGoalsScreen({super.key});
@@ -608,7 +610,36 @@ class _FinancesGoalsScreenState extends State<FinancesGoalsScreen> {
                             // Income/Expense
                             GestureDetector(
                               onTap: () {
-                                // TODO: Navigate to add income/expense
+                                if (_financeView == 'income') {
+                                  // navigate to add income
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddIncomeScreen(
+                                        onBack: () => Navigator.pop(context),
+                                        onSave: (incomeData) {
+                                          print('Income saved: $incomeData');
+                                          // TODO: Save to backend/local storage
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddExpenseScreen(
+                                        onBack: () => Navigator.pop(context),
+                                        onSave: (expenseData) {
+                                          print('Expense saved: $expenseData');
+                                          // TODO: Save to backend/local storage
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(16),
@@ -641,7 +672,7 @@ class _FinancesGoalsScreenState extends State<FinancesGoalsScreen> {
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      'Add ${_financeView == 'income' ? 'Income' : 'Expense'}',
+                                      'Log ${_financeView == 'income' ? 'Income' : 'Expense'}',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
