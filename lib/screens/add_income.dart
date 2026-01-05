@@ -29,7 +29,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   DateTime _selectedDate = DateTime.now();
   bool _showClientDropdown = false;
   bool _showSkillDropdown = false;
-  
+
   final Map<String, String> _errors = {};
 
   final List<String> _clients = [
@@ -65,11 +65,23 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     super.dispose();
   }
 
+  void _calculateAmount() {
+    if (_hoursController.text.isNotEmpty && _rateController.text.isNotEmpty) {
+      final hours = double.tryParse(_hoursController.text);
+      final rate = double.tryParse(_rateController.text);
+      if (hours != null && rate != null) {
+        setState(() {
+          _amountController.text = (hours * rate).toStringAsFixed(2);
+        });
+      }
+    }
+  }
+
   bool _validateForm() {
     setState(() {
       _errors.clear();
-      
-      if (_amountController.text.isEmpty || 
+
+      if (_amountController.text.isEmpty ||
           double.tryParse(_amountController.text) == null ||
           double.parse(_amountController.text) <= 0) {
         _errors['amount'] = 'Amount is required';
@@ -84,25 +96,13 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       widget.onSave({
         'amount': _amountController.text,
         'projectName': _projectNameController.text,
-        'client': _selectedClient,
-        'skill': _selectedSkill,
+        'client': _selectedClient == _clients[0] ? null : _selectedClient,
+        'skill': _selectedSkill == _skills[0] ? null : _selectedSkill,
         'hours': _hoursController.text,
-        'rate': _rateController.text,
-        'date': _selectedDate.toIso8601String(),
+        'ratePerHour': _rateController.text,
         'notes': _notesController.text,
+        'date': _selectedDate.toIso8601String(),
       });
-    }
-  }
-
-  void _calculateAmount() {
-    if (_hoursController.text.isNotEmpty && _rateController.text.isNotEmpty) {
-      final hours = double.tryParse(_hoursController.text);
-      final rate = double.tryParse(_rateController.text);
-      if (hours != null && rate != null) {
-        setState(() {
-          _amountController.text = (hours * rate).toStringAsFixed(2);
-        });
-      }
     }
   }
 
@@ -113,64 +113,57 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final secondaryText = isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText;
-    final tertiaryText = isDark ? AppColors.darkTertiaryText  : AppColors.lightTertiaryText;
+    final tertiaryText = isDark ? AppColors.darkTertiaryText : AppColors.lightTertiaryText;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final green = const Color(0xFF34C759);
     final greenBg = green.withOpacity(0.1);
+    final blue = const Color(0xFF007AFF);
+    final blueBg = blue.withOpacity(0.1);
     final red = const Color(0xFFFF3B30);
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: borderColor, width: 1),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: widget.onBack,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: textColor,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Add Income',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 40),
-                ],
-              ),
-            ),
-
-            // Form Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+      body: Stack(
+        children: [
+          // Everything Scrollable (Header + Form)
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: widget.onBack,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: textColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Log Income',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 40),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
                     // Amount Input - Featured
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,12 +184,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: _errors.containsKey('amount') ? red : borderColor,
                               width: _errors.containsKey('amount') ? 2 : 1,
@@ -270,17 +263,17 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: borderColor),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.business_center_outlined, color: tertiaryText, size: 20),
+                              Icon(Icons.work_outline, color: tertiaryText, size: 20),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
@@ -314,7 +307,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -323,15 +316,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: borderColor),
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.person_outline, color: tertiaryText, size: 20),
+                                Icon(Icons.search, color: tertiaryText, size: 20),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
@@ -360,7 +353,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             margin: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: borderColor),
                               boxShadow: [
                                 BoxShadow(
@@ -372,29 +365,40 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             ),
                             child: Column(
                               children: [
+                                // Search Input
                                 Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: TextField(
-                                    controller: _clientSearchController,
-                                    style: TextStyle(color: textColor, fontSize: 15),
-                                    decoration: InputDecoration(
-                                      hintText: 'Search or type new client...',
-                                      hintStyle: TextStyle(color: tertiaryText),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: borderColor),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: borderColor),
-                                      ),
-                                      isDense: true,
-                                      contentPadding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: bgColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.search, color: tertiaryText, size: 16),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _clientSearchController,
+                                            autofocus: true,
+                                            style: TextStyle(color: textColor, fontSize: 14),
+                                            decoration: InputDecoration(
+                                              hintText: 'Search clients...',
+                                              hintStyle: TextStyle(color: tertiaryText),
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
+                                // Client List
                                 Container(
-                                  constraints: const BoxConstraints(maxHeight: 224),
+                                  constraints: const BoxConstraints(maxHeight: 200),
                                   child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: _clients.length,
@@ -419,7 +423,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                             horizontal: 16,
                                             vertical: 14,
                                           ),
-                                          color: isSelected ? greenBg : Colors.transparent,
+                                          color: isSelected ? blueBg : Colors.transparent,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
@@ -431,7 +435,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                                 ),
                                               ),
                                               if (isSelected)
-                                                Icon(Icons.check, color: green, size: 20),
+                                                Icon(Icons.check, color: blue, size: 20),
                                             ],
                                           ),
                                         ),
@@ -460,12 +464,14 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                         children: [
                                           Icon(Icons.add, color: green, size: 20),
                                           const SizedBox(width: 12),
-                                          Text(
-                                            'Add "${_clientSearchController.text}" as new client',
-                                            style: TextStyle(
-                                              color: green,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
+                                          Expanded(
+                                            child: Text(
+                                              'Add "${_clientSearchController.text}" as new client',
+                                              style: TextStyle(
+                                                color: green,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -491,7 +497,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -500,15 +506,15 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: borderColor),
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.code_outlined, color: tertiaryText, size: 20),
+                                Icon(Icons.search, color: tertiaryText, size: 20),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
@@ -537,7 +543,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             margin: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: borderColor),
                               boxShadow: [
                                 BoxShadow(
@@ -549,29 +555,40 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             ),
                             child: Column(
                               children: [
+                                // Search Input
                                 Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: TextField(
-                                    controller: _skillSearchController,
-                                    style: TextStyle(color: textColor, fontSize: 15),
-                                    decoration: InputDecoration(
-                                      hintText: 'Search or type new skill...',
-                                      hintStyle: TextStyle(color: tertiaryText),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: borderColor),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: borderColor),
-                                      ),
-                                      isDense: true,
-                                      contentPadding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: bgColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.search, color: tertiaryText, size: 16),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _skillSearchController,
+                                            autofocus: true,
+                                            style: TextStyle(color: textColor, fontSize: 14),
+                                            decoration: InputDecoration(
+                                              hintText: 'Search skills...',
+                                              hintStyle: TextStyle(color: tertiaryText),
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
+                                // Skill List
                                 Container(
-                                  constraints: const BoxConstraints(maxHeight: 224),
+                                  constraints: const BoxConstraints(maxHeight: 200),
                                   child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: _skills.length,
@@ -596,7 +613,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                             horizontal: 16,
                                             vertical: 14,
                                           ),
-                                          color: isSelected ? greenBg : Colors.transparent,
+                                          color: isSelected ? blueBg : Colors.transparent,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
@@ -608,7 +625,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                                 ),
                                               ),
                                               if (isSelected)
-                                                Icon(Icons.check, color: green, size: 20),
+                                                Icon(Icons.check, color: blue, size: 20),
                                             ],
                                           ),
                                         ),
@@ -637,12 +654,14 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                         children: [
                                           Icon(Icons.add, color: green, size: 20),
                                           const SizedBox(width: 12),
-                                          Text(
-                                            'Add "${_skillSearchController.text}" as new skill',
-                                            style: TextStyle(
-                                              color: green,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
+                                          Expanded(
+                                            child: Text(
+                                              'Add "${_skillSearchController.text}" as new skill',
+                                              style: TextStyle(
+                                                color: green,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -656,9 +675,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Hours and Rate - Side by Side
+                    // Hours and Rate side by side
                     Row(
                       children: [
+                        // Hours
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,17 +691,17 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 6),
                               Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                                 decoration: BoxDecoration(
                                   color: cardBg,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(16),
                                   border: Border.all(color: borderColor),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.access_time_outlined, color: tertiaryText, size: 20),
+                                    Icon(Icons.access_time, color: tertiaryText, size: 20),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: TextField(
@@ -705,6 +725,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
+                        // Rate per hour
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -717,12 +738,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 6),
                               Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                                 decoration: BoxDecoration(
                                   color: cardBg,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(16),
                                   border: Border.all(color: borderColor),
                                 ),
                                 child: Row(
@@ -766,7 +787,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         GestureDetector(
                           onTap: () async {
                             final date = await showDatePicker(
@@ -782,10 +803,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: borderColor),
                             ),
                             child: Row(
@@ -816,12 +837,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: borderColor),
                           ),
                           child: Row(
@@ -829,7 +850,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
-                                child: Icon(Icons.description_outlined, color: tertiaryText, size: 20),
+                                child: Icon(Icons.notes_outlined, color: tertiaryText, size: 20),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -855,59 +876,83 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 ),
               ),
             ),
+          ),
 
-            // Bottom Buttons
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1C1C1E).withOpacity(0.95)
-                    : const Color(0xFFECECEC).withOpacity(0.95),
-                border: Border(
-                  top: BorderSide(color: borderColor),
-                ),
-              ),
+          // Floating Buttons at Bottom
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 24,
+            child: SafeArea(
+              top: false,
               child: Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: widget.onBack,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: textColor,
-                        side: BorderSide(color: borderColor, width: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 18),
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderColor, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: widget.onBack,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Center(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: _handleSave,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: green,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF34C759), Color(0xFF2FB350)],
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        elevation: 8,
-                        shadowColor: green.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: green.withOpacity(0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
-                      child: const Text(
-                        'Save Income',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleSave,
+                          borderRadius: BorderRadius.circular(16),
+                          child: const Center(
+                            child: Text(
+                              'Save Income',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -915,8 +960,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
