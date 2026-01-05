@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'colors.dart';
 import 'screens/create_invoice.dart';
 import 'screens/add_expense.dart';
+import 'screens/add_income.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -930,11 +931,23 @@ class DashboardScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 12),
 
-                              // add clients button
+                              // log income button
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    // TODO: Navigate to add client
+                                    Navigator.push(
+                                      context, 
+                                      MaterialPageRoute(
+                                        builder: (context) => AddIncomeScreen(
+                                          onBack: () => Navigator.pop(context), 
+                                          onSave: (incomeData) {
+                                            print('Income saved: $incomeData');
+                                            // TODO: call API
+                                            Navigator.pop(context);
+                                          }
+                                        )
+                                      )
+                                    );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(16),
@@ -959,7 +972,7 @@ class DashboardScreen extends StatelessWidget {
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(
-                                            Icons.people_alt_rounded,
+                                            Icons.trending_up_outlined,
                                             size: 24,
                                             color: AppColors.blue,
                                           ),
@@ -967,7 +980,7 @@ class DashboardScreen extends StatelessWidget {
                                         const SizedBox(height: 8),
 
                                         Text(
-                                          'Add Client',
+                                          'Log Income',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
