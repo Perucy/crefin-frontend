@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../widgets/logo.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../colors.dart';
-import '../../services/auth_storage.dart';
+import '../../services/auth_service.dart';
+import '../../services/api_client.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,36 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      // TODO: Replace with actual API call to your backend
-      // Example:
-      // final response = await http.post(
-      //   Uri.parse('http://localhost:3000/api/v1/auth/login'),
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode({
-      //     'email': _emailController.text,
-      //     'password': _passwordController.text,
-      //   }),
-      // );
-      //
-      // if (response.statusCode == 200) {
-      //   final data = jsonDecode(response.body);
-      //   await AuthStorage.saveAuthData(
-      //     token: data['token'],
-      //     refreshToken: data['refreshToken'],
-      //     userId: data['user']['id'],
-      //   );
-      // } else {
-      //   throw Exception('Login failed');
-      // }
+      // create auth service instance
+      final apiClient = ApiClient();
+      final authService = AuthService(apiClient);
 
-      // Simulating API call for now
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Save auth tokens (replace with real tokens from your API)
-      await AuthStorage.saveAuthData(
-        token: 'dummy_jwt_token',
-        refreshToken: 'dummy_refresh_token',
-        userId: 'user_123',
+      final user = await authService.login(
+        email: _emailController.text, 
+        password: _passwordController.text
       );
 
       setState(() {
@@ -83,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     } catch (e) {
       setState(() {
-        _error = 'Login failed. Please check your credentials.';
+        _error = e.toString().replaceAll('Exception: ', '');
         _isLoading = false;
       });
     }
