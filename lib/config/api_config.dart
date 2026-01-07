@@ -5,7 +5,7 @@ class ApiConfig {
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String refreshToken = '/auth/refresh';
-  
+  static const String logout = '/logout';
   static const String income = '/income';
   static const String expenses = '/expenses';
   static const String invoices = '/invoices';
