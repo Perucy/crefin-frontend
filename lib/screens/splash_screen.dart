@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/logo.dart';
-import '../services/auth_storage.dart';
+import '../utils/app_storage.dart';
+import '../services/auth_service.dart';
+import '../services/api_client.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,9 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
+    final apiClient = ApiClient();
+    final authService = AuthService(apiClient);
+
     // Check authentication and onboarding status
-    final isLoggedIn = await AuthStorage.isLoggedIn();
-    final hasSeenOnboarding = await AuthStorage.hasSeenOnboarding();
+    final isLoggedIn = await authService.isLoggedIn();
+    final hasSeenOnboarding = await AppStorage.hasSeenOnboarding();
 
     if (!mounted) return;
 
