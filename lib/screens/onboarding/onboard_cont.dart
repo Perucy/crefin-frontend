@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_storage.dart';
-import 'onboard_1.dart';  // ← Changed
-import 'onboard_2.dart';  // ← Changed
-import 'onboard_3.dart';  // ← Changed
+import '../../utils/app_storage.dart';
+import 'onboard_1.dart';  
+import 'onboard_2.dart';  
+import 'onboard_3.dart';  
 
 class OnboardingContainer extends StatefulWidget {
   const OnboardingContainer({super.key});
@@ -32,7 +32,7 @@ class _OnboardingContainerState extends State<OnboardingContainer> {
 
   Future<void> _skipOrFinish() async {
     // Mark onboarding as completed
-    await AuthStorage.completeOnboarding();
+    await AppStorage.completeOnboarding();
     
     if (!mounted) return;
     
