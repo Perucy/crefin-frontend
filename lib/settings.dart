@@ -1,10 +1,95 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
+import 'services/api_client.dart';
+import 'services/auth_service.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
   
   const SettingsScreen({super.key, required this.onToggleTheme});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isLoggingOut = false;
+
+  Future<void> _handleLogout() async {
+    // Capture before any await
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final brightness = Theme.of(context).brightness;
+    
+    // Confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: brightness == Brightness.dark
+          ? AppColors.darkCard
+          : AppColors.lightCard,
+        title: Text(
+          'Logout',
+          style: TextStyle(
+            color: brightness == Brightness.dark
+                ? AppColors.darkText
+                : AppColors.lightText,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(
+            color: brightness == Brightness.dark
+                ? AppColors.darkSecondaryText
+                : AppColors.lightSecondaryText,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout != true) return;
+
+    // Perform logout
+    setState(() => _isLoggingOut = true);
+
+    try {
+      final apiClient = ApiClient();
+      final authService = AuthService(apiClient);
+      
+      await authService.logout();
+      
+      if (!mounted) return;
+      
+      // Use captured navigator
+      navigator.pushNamedAndRemoveUntil(
+        '/login',
+        (route) => false,
+      );
+      
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() => _isLoggingOut = false);
+      
+      // Use captured scaffoldMessenger
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +252,7 @@ class SettingsScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               
                               GestureDetector(
-                                onTap: onToggleTheme,  // Call the theme toggle
+                                onTap: widget.onToggleTheme,
                                 child: _builDarkModeToggle(
                                   context: context, 
                                   isDark: isDark
@@ -217,25 +302,36 @@ class SettingsScreen extends StatelessWidget {
 
                           // Sign Out Button
                           GestureDetector(
-                            onTap: () {
-                              // TODO: Add sign out logic
-                            },
+                            onTap: _isLoggingOut ? null : _handleLogout,
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1C1C1E),
+                                color: _isLoggingOut 
+                                    ? const Color(0xFF1C1C1E).withOpacity(0.5)
+                                    : const Color(0xFF1C1C1E),
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Text(
-                                'Sign Out',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child: _isLoggingOut
+                                  ? const Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Sign Out',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
                         ],
